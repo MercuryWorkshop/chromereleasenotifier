@@ -25,7 +25,6 @@ fn main() {
                         .expect("Cannot decode title value").to_string();
                     if txt.contains("Stable Channel Update for ChromeOS/ChromeOS Flex") {
                         toprint.push(txt);
-                        toprint.push("======".to_string());
                     }
                 } else if e.name().as_ref() == b"content" {
                     let txt = reader
