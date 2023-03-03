@@ -23,7 +23,7 @@ fn main() {
                     let txt = reader
                         .read_text(e.name())
                         .expect("Cannot decode title value").to_string();
-                    if txt.contains("ChromeOS") {
+                    if txt.contains("Stable Channel Update for ChromeOS/ChromeOS Flex") {
                         toprint.push(txt);
                         toprint.push("======".to_string());
                     }
@@ -33,7 +33,7 @@ fn main() {
                         .expect("Cannot decode content value");
                     let unescaped = quick_xml::escape::unescape(&txt).expect("Cannot unescape content").to_string();
                     let textified = nanohtml2text::html2text(&unescaped).to_string().replace("\r\n", "\n");
-                    if txt.contains("ChromeOS")  {
+                    if txt.contains("Stable channel") && txt.contains("ChromeOS")  {
                         toprint.push(textified);
                         toprint.push("============".to_string());
                     }
