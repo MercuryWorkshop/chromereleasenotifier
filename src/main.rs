@@ -23,16 +23,20 @@ fn main() {
                     let txt = reader
                         .read_text(e.name())
                         .expect("Cannot decode title value").to_string();
-                    toprint.push(txt);
-                    toprint.push("======".to_string());
+                    if txt.contains("ChromeOS") {
+                        toprint.push(txt);
+                        toprint.push("======".to_string());
+                    }
                 } else if e.name().as_ref() == b"content" {
                     let txt = reader
                         .read_text(e.name())
                         .expect("Cannot decode content value");
                     let unescaped = quick_xml::escape::unescape(&txt).expect("Cannot unescape content").to_string();
                     let textified = nanohtml2text::html2text(&unescaped).to_string().replace("\r\n", "\n");
-                    toprint.push(textified);
-                    toprint.push("============".to_string());
+                    if txt.contains("ChromeOS")  {
+                        toprint.push(textified);
+                        toprint.push("============".to_string());
+                    }
                 }
             }
             Ok(Event::Eof) => break, // exits the loop when reaching end of file
