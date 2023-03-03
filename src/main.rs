@@ -5,6 +5,19 @@ use quick_xml::reader::Reader;
 
 // beware this has ALL been hacked together by someone who knows 0 rust
 fn main() {
+    let mut shouldprint = false;
+    if let Some(firstarg) = std::env::args().nth(1) {
+        if firstarg == "print" {
+            shouldprint = true;
+        } else if firstarg == "help" {
+            println!("Chrome Releases Notifier");
+            println!("usage: chromereleasenotifer [print|help]");
+            println!("adding print will print to the console");
+            println!("adding help will show this help screen");
+            println!("by default it will send a XDG notification to your DE");
+            return;
+        }
+    }
     // get chrome releases from rss
     let mut res = reqwest::blocking::get("http://feeds.feedburner.com/GoogleChromeReleases").expect("Could not get rss");
     let mut body = String::new();
@@ -56,10 +69,15 @@ fn main() {
             }
         }
         let filteredcontent = filteredvec.join("\n");
-        notify_rust::Notification::new()
-                            .summary("Chrome Releases Notifier")
-                            .body(&filteredcontent)
-                            .show()
-                            .expect("Failed to show notification");
+        if shouldprint {
+            println!("{}", filteredcontent);
+            println!("__CUT_HERE");
+        } else {
+            notify_rust::Notification::new()
+                                .summary("Chrome Releases Notifier")
+                                .body(&filteredcontent)
+                                .show()
+                                .expect("Failed to show notification");
+        }
     }
 }
