@@ -28,12 +28,9 @@ async def beforetimedfetch():
 	await bot.wait_until_ready()
 
 def createEmbed():
-	crnfull = subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "full"]).decode('utf8')
 	crnprint = subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"]).decode('utf8')
-	crnfull = crnfull.split(sep="__CUT_HERE")
 	crnprint = crnprint.split(sep="__CUT_HERE")
 
-	crnfull.pop()
 	crnprint.pop()
 
 	embed=nextcord.Embed(title="Chrome Releases Notifier", description="Releases fetched from Google", url="https://chromereleases.googleblog.com/")
@@ -41,8 +38,8 @@ def createEmbed():
 	embed.set_thumbnail(url="https://media.discordapp.net/attachments/1040039623323299992/1095547290845970462/250px-Mascot_konqi.png")
 	embed.set_footer(text="Chrome Releases Notifier")
 
-	for f, p in zip(crnfull, crnprint):
-		embed.add_field(name=p, value=f, inline=False)
+	for p in crnprint:
+		embed.add_field(name="Chrome Release", value=p, inline=False)
 	return embed
 
 timedfetch.start()
