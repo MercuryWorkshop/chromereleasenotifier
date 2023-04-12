@@ -10,10 +10,10 @@ TOKEN="kde plasma token"
 people = ["CoolElectronics", "Rafflesia", "r58Playz", "kotlin", "Astral", "Catakang", "avd3"]
 channelId=1066136075703177337
 
-if not (os.path.exists("{SCRDIR}/prevoutput.out")):
+if not (os.path.exists(f"{SCRDIR}/prevoutput.out")):
 	print("md5 of the current release does not exist, creating")
 	curhash = md5(subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"])).hexdigest()
-	with open(f"{SCRDIR}/prevoutput.out", "wb+") as file:
+	with open(f"{SCRDIR}/prevoutput.out", "w") as file:
 		file.write(curhash)
 
 bot = commands.Bot()
@@ -28,9 +28,9 @@ async def fetchreleases(ctx):
 
 @tasks.loop(hours=24)
 async def timedfetch():
-	with open(f"{SCRDIR}/prevoutput.out", "rb") as chashfile:
-		prevhash = md5(open(f"{SCRDIR}/prevoutput.out", "rb").read()).hexdigest()
-		if chashfile.read() != prevhash:
+	with open(f"{SCRDIR}/prevoutput.out", "r") as chashfile:
+		curhash = md5(subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"])).hexdigest()
+		if chashfile.read() != curhash:
 			print("chrome release detected!")
 			channel = bot.get_channel(channelId)
 			await channel.send("ping here? idk", embed=createEmbed())
