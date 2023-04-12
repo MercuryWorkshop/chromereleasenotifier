@@ -26,7 +26,7 @@ async def on_ready():
 async def fetchreleases(ctx):
 	await ctx.send(embed=createEmbed())
 
-@tasks.loop(hours=24)
+@tasks.loop(minutes=30)
 async def timedfetch():
 	with open(f"{SCRDIR}/prevoutput.out", "r") as chashfile:
 		curhash = md5(subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"])).hexdigest()
