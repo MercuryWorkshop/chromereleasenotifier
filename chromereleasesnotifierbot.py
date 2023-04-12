@@ -2,10 +2,19 @@ import nextcord
 from nextcord.ext import commands, tasks
 import subprocess
 import random
+from hashlib import md5
+import os
 
+SCRDIR = os.path.dirname(os.path.abspath( __file__ ))
 TOKEN="kde plasma token"
 people = ["CoolElectronics", "Rafflesia", "r58Playz", "kotlin", "Astral", "Catakang", "avd3"]
 channelId=1066136075703177337
+
+if not (os.path.exists("{SCRDIR}/prevoutput.out")):
+	print("md5 of the current release does not exist, creating")
+	curhash = md5(subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"])).hexdigest()
+	with open(f"{SCRDIR}/prevoutput.out", "wb+") as file:
+		file.write(curhash)
 
 bot = commands.Bot()
 
@@ -19,9 +28,19 @@ async def fetchreleases(ctx):
 
 @tasks.loop(hours=24)
 async def timedfetch():
-	channel = bot.get_channel(channelId)
-	await channel.send("ping here? idk", embed=createEmbed())
-	print("sent timed message")
+	with open(f"{SCRDIR}/prevoutput.out", "rb") as chashfile:
+		prevhash = md5(open(f"{SCRDIR}/prevoutput.out", "rb").read()).hexdigest()
+		if chashfile.read() != prevhash:
+			print("chrome release detected!")
+			channel = bot.get_channel(channelId)
+			await channel.send("ping here? idk", embed=createEmbed())
+			print("sent timed message")
+			chashfile.truncate()
+			chashfile.write(prevhash)
+		else:
+			print("no new chrome release")
+
+
 
 @timedfetch.before_loop
 async def beforetimedfetch():
