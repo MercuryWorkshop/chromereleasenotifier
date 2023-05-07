@@ -1,7 +1,7 @@
-use std::io::Read;
+use dialog::DialogBox;
 use quick_xml::events::Event;
 use quick_xml::reader::Reader;
-use dialog::DialogBox;
+use std::io::Read;
 
 fn showdialog(title: String, content: String) {
     let mut backend = dialog::backends::KDialog::new(); // zenity doesn't want to use my body content (it just says "All updates are complete")
@@ -34,9 +34,11 @@ fn main() {
         }
     }
     // get chrome releases from rss
-    let mut res = reqwest::blocking::get("http://feeds.feedburner.com/GoogleChromeReleases").expect("Could not get rss");
+    let mut res = reqwest::blocking::get("http://feeds.feedburner.com/GoogleChromeReleases")
+        .expect("Could not get rss");
     let mut body = String::new();
-    res.read_to_string(&mut body).expect("Could not read response");
+    res.read_to_string(&mut body)
+        .expect("Could not read response");
 
     // parse the xml output
     let mut reader = Reader::from_str(&body);
@@ -51,9 +53,15 @@ fn main() {
                     let txt = reader
                         .read_text(e.name())
                         .expect("Cannot decode content value");
-                    let unescaped = quick_xml::escape::unescape(&txt).expect("Cannot unescape content").to_string();
-                    let textified = nanohtml2text::html2text(&unescaped).to_string().replace("\r\n", "\n");
-                    if txt.contains("Stable channel") && txt.contains("ChromeOS")  {
+                    let unescaped = quick_xml::escape::unescape(&txt)
+                        .expect("Cannot unescape content")
+                        .to_string();
+                    let textified = nanohtml2text::html2text(&unescaped)
+                        .to_string()
+                        .replace("\r\n", "\n");
+                    if
+                    /*txt.contains("Stable channel") &&*/
+                    txt.contains("ChromeOS") {
                         contents.push(textified);
                     }
                 }
@@ -75,15 +83,32 @@ fn main() {
             for line in splittedvec {
                 if line == "" {
                     // skip all empty lines
+                } else if line.contains("If you find new issues") {
+                    // Beta/dev channel is also different
+                    let splittedline: Vec<&str> = line
+                        .split("If you find new issues")
+                        .collect();
+                    filteredvec.push(splittedline[0].to_string());
                 } else if line.contains("is being updated to") {
                     // The * channel is being updated to <version> (Platform version: <version>) is all we need
-                    let splittedline: Vec<&str> = line.split("for most ChromeOS devices and will be rolled out").collect();
+                    let splittedline: Vec<&str> = line
+                        .split("for most ChromeOS devices and will be rolled out")
+                        .collect();
+                    filteredvec.push(splittedline[0].to_string());
+                } else if line.contains("is being updated in the LTS") { 
+                    // LTS uses a different post format
+                    let splittedline: Vec<&str> = line
+                        .split("Want to know more about")
+                        .collect();
                     filteredvec.push(splittedline[0].to_string());
                 } else if line.contains("Security Fixes and Rewards") {
                     filteredvec.push("".to_string());
                     filteredvec.push(line.to_string());
                     isaftersecurityfixes = true;
-                } else if isaftersecurityfixes && !(line.contains("Access to bug details and links") || line.contains("We would also like to thank")) {
+                } else if isaftersecurityfixes
+                    && !(line.contains("Access to bug details and links")
+                        || line.contains("We would also like to thank"))
+                {
                     filteredvec.push(line.to_string());
                 }
             }
@@ -95,15 +120,17 @@ fn main() {
             println!("__CUT_HERE");
         } else {
             notify_rust::Notification::new()
-                                .summary("Chrome Releases Notifier")
-                                .body(&filteredcontent)
-                                .action("clicked_info", "More Info")
-                                .show()
-                                .unwrap()
-                                .wait_for_action(|action| match action {
-                                        "clicked_info" => showdialog("Chrome Releases Notifier".to_string(), content.to_owned()),
-                                        _ => (),
-                                    });
+                .summary("Chrome Releases Notifier")
+                .body(&filteredcontent)
+                .action("clicked_info", "More Info")
+                .show()
+                .unwrap()
+                .wait_for_action(|action| match action {
+                    "clicked_info" => {
+                        showdialog("Chrome Releases Notifier".to_string(), content.to_owned())
+                    }
+                    _ => (),
+                });
         }
     }
 }
