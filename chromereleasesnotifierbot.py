@@ -9,12 +9,12 @@ SCRDIR = os.path.dirname(os.path.abspath( __file__ ))
 TOKEN="kde plasma token"
 people = ["CoolElectronics", "Rafflesia", "r58Playz", "kotlin", "Astral", "Catakang", "avd3"]
 channelId=1066136075703177337
-
 if not (os.path.exists(f"{SCRDIR}/prevoutput.out")):
 	print("md5 of the current release does not exist, creating")
 	curhash = md5(subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"])).hexdigest()
 	with open(f"{SCRDIR}/prevoutput.out", "w") as file:
 		file.write(curhash)
+		file.close()
 
 bot = commands.Bot()
 
@@ -26,7 +26,7 @@ async def on_ready():
 async def fetchreleases(ctx):
 	await ctx.send(embed=createEmbed())
 
-@tasks.loop(minutes=30)
+@tasks.loop(minutes=5)
 async def timedfetch():
 	with open(f"{SCRDIR}/prevoutput.out", "r") as chashfile:
 		curhash = md5(subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"])).hexdigest()
@@ -35,8 +35,11 @@ async def timedfetch():
 			channel = bot.get_channel(channelId)
 			await channel.send("ping here? idk", embed=createEmbed())
 			print("sent timed message")
-			chashfile.truncate()
-			chashfile.write(prevhash)
+			chashfile.close()
+			with open(f"{SCRDIR}/prevoutput.out", "w") as chashfilew:
+			    chashfilew.truncate()
+			    chashfilew.write(curhash)
+			    chashfilew.close()
 		else:
 			print("no new chrome release")
 
