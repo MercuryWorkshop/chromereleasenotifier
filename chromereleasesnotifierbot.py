@@ -33,7 +33,7 @@ async def timedfetch():
 		if chashfile.read() != curhash:
 			print("chrome release detected!")
 			channel = bot.get_channel(channelId)
-			await channel.send("ping here? idk", embed=createEmbed())
+			await channel.send("<@&1134322964448432138> konqi has delivered", embed=createEmbed())
 			print("sent timed message")
 			chashfile.close()
 			with open(f"{SCRDIR}/prevoutput.out", "w") as chashfilew:
