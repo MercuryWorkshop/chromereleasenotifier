@@ -8,7 +8,8 @@ edition = "2021"
 [dependencies]
 dialog = "0.3.0"
 error-chain = "0.12.4"
-nanohtml2text = "0.1.4"
+html2text = "0.6.0"
 notify-rust = "4.8.0"
 quick-xml = "0.27.1"
+regex = "1.9.1"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
