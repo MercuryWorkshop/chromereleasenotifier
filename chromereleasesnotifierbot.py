@@ -24,7 +24,7 @@ async def on_ready():
 
 @bot.slash_command()
 async def fetchreleases(ctx):
-	await ctx.send(embed=createEmbed())
+	await ctx.send(embed=createEmbed(False, False))
 
 @tasks.loop(minutes=5)
 async def timedfetch():
