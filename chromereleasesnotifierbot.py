@@ -6,9 +6,9 @@ from hashlib import md5
 import os
 
 SCRDIR = os.path.dirname(os.path.abspath( __file__ ))
-TOKEN="kde plasma token"
+TOKEN=""
 people = ["CoolElectronics", "Rafflesia", "r58Playz", "kotlin", "Astral", "Catakang", "avd3"]
-channelId=1066136075703177337
+channels = [[1066136075703177337,"<@&1134322964448432138>"],[1135240487255678976, "<@&1135240963741200506>"]]
 if not (os.path.exists(f"{SCRDIR}/prevoutput.out")):
 	print("output of the current release does not exist, creating")
 	curhash = subprocess.check_output(["/home/e/chromereleasenotifier/target/release/chromereleasesnotifier", "print"]).decode('utf8');
@@ -33,9 +33,10 @@ async def timedfetch():
 		oldhash = chashfile.read();
 		if oldhash != curhash:
 			print("chrome release detected!")
-			channel = bot.get_channel(channelId)
-			await channel.send("<@&1134322964448432138> konqi has delivered", embed=createEmbed(curhash, oldhash))
-			print("sent timed message")
+			for channelId in channels:
+			    channel = bot.get_channel(channelId[0])
+			    await channel.send(channelId[1] + " konqi has delivered", embed=createEmbed(curhash, oldhash))
+			print("sent timed message(s)")
 			chashfile.close()
 			with open(f"{SCRDIR}/prevoutput.out", "w") as chashfilew:
 			    chashfilew.truncate()
@@ -56,6 +57,7 @@ def createEmbed(curout,oldout):
 	else: 
 	    crnprint = curout
 	crnprint = crnprint.split(sep="__CUT_HERE")
+	crnprint.pop()
 	if oldout:
 	    oldoutsplit = oldout.split(sep="__CUT_HERE")
 	    crnprint = [x for x in crnprint if x not in oldoutsplit] 
@@ -66,7 +68,7 @@ def createEmbed(curout,oldout):
 	embed.set_footer(text="Delivered proudly by Konqi :3")
 
 	for p in crnprint:
-		embed.add_field(name=("New Chrome Release" if oldout else "Chrome Release"), value=p, inline=False)
+		embed.add_field(name=("New Chrome Release" if oldout else "Chrome Release"), value=(p[:1021]+"..." if len(p) > 1024 else p), inline=False)
 	return embed
 
 timedfetch.start()
