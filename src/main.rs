@@ -180,12 +180,12 @@ fn main() {
         let mut filteredcontent = content.to_owned();
         if !shouldfull {
             let mut filteredvec: Vec<String> = Vec::new();
-            let splittedcontent = content.split("\n");
+            let splittedcontent = content.split('\n');
             let splittedvec: Vec<&str> = splittedcontent.collect();
             let mut isaftersecurityfixes = false;
             for l in splittedvec {
                 let line = l.trim();
-                if line == "" {
+                if line.is_empty() {
                     // skip all empty lines
                 } else if line.contains("has been updated to") {
                     // Beta/dev channel is also different
@@ -207,7 +207,7 @@ fn main() {
                     let splittedline: Vec<&str> =
                         line.split(" for most ChromeOS devices.").collect();
                     filteredvec.push(splittedline[0].to_string() + ".");
-                } else if line.contains("Security Fixes and Rewards") {
+                } else if line.contains("Security Fixes and Rewards") || line.contains("Security fixes") {
                     filteredvec.push("".to_string());
                     filteredvec.push(line.to_string());
                     isaftersecurityfixes = true;
@@ -234,11 +234,8 @@ fn main() {
                 .action("clicked_info", "More Info")
                 .show()
                 .unwrap()
-                .wait_for_action(|action| match action {
-                    "clicked_info" => {
+                .wait_for_action(|action| if action == "clicked_info" {
                         showdialog("Chrome Releases Notifier".to_string(), content.to_owned())
-                    }
-                    _ => (),
                 });
         }
     }
