@@ -30,11 +30,11 @@ impl html2text::render::text_renderer::TextDecorator for MdDecorator {
 
     fn decorate_link_start(&mut self, _url: &str) -> (String, Self::Annotation) {
         self.currentlink = _url.into();
-        ("(".to_string(), ())
+        ("[".to_string(), ())
     }
 
     fn decorate_link_end(&mut self) -> String {
-        format!(")[{}]", self.currentlink)
+        format!("]({})", self.currentlink)
     }
 
     fn decorate_em_start(&mut self) -> (String, Self::Annotation) {
@@ -70,10 +70,8 @@ impl html2text::render::text_renderer::TextDecorator for MdDecorator {
     }
 
     fn decorate_preformat_first(&mut self) -> Self::Annotation {
-        ()
     }
     fn decorate_preformat_cont(&mut self) -> Self::Annotation {
-        ()
     }
 
     fn decorate_image(&mut self, _src: &str, title: &str) -> (String, Self::Annotation) {
