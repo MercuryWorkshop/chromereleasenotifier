@@ -200,7 +200,7 @@ fn main() {
                     // LTS uses a different post format
                     let splittedline: Vec<&str> = line.split("Want to know more about").collect();
                     filteredvec.push(splittedline[0].to_string());
-                } else if line.contains("A new LTC-") {
+                } else if line.contains("A new LTC-") || line.contains("is being updated in the LTC") {
                     // LTC uses a different post format
                     let splittedline: Vec<&str> =
                         line.split(" for most ChromeOS devices.").collect();
